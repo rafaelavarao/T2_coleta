@@ -9,14 +9,10 @@ api = Api(app)
 
 #Lendo o csv
 df = pd.read_csv('games.csv')
-#Mudando o nome da primeira coluna para "Index"
-df.rename({'Unnamed: 0' : 'Index'}, axis=1, inplace=True)
 
-##Transformando o data frame em dicionario
-GAMES = df.to_dict()
+#seta como index a primeira coluna do df e faz a transposta do dicionario
+GAMES = df.set_index('Unnamed: 0').T.to_dict()
 
- #Todo
-# shows a single games and lets you delete a Country
 
 def abort_if_game_doesnt_exist(games_id):
     if games_id not in GAMES:
