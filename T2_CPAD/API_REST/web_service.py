@@ -8,11 +8,10 @@ app = Flask(__name__)
 api = Api(app)
 
 #Lendo o csv
-df = pd.read_csv('games.csv')
+df = pd.read_csv('games.csv', encoding='utf-8')
 
-#seta como index a primeira coluna do df e faz a transposta do dicionario
+#Defini a primeira coluna como index do df e faz a transposta do dicionario
 GAMES = df.set_index('Unnamed: 0').T.to_dict()
-
 
 def abort_if_game_doesnt_exist(games_id):
     if games_id not in GAMES:
@@ -53,8 +52,11 @@ class Games(Resource):
                    'Summary': args['Summary'], 'Reviews': args['Reviews'],
                    'Plays': args['Plays'], 'Playing': args['Playing'],
                    'Backlogs': args['Backlogs'], 'Wishlist': args['Wishlist']}
-        GAMES[games_id] = content
-        return content, 201
+        game = GAMES[games_id]
+        for key in content:
+            if content[key] is not None:
+                game[key] = content[key]
+        return game, 201
 
 
 class GameList(Resource):
@@ -72,12 +74,10 @@ class GameList(Resource):
                            'Plays': args['Plays'], 'Playing': args['Playing'],
                            'Backlogs': args['Backlogs'], 'Wishlist': args['Wishlist']}
         return GAMES[games_id], 201
-    
 
 ## Actually setup the Api resource routing here
 api.add_resource(GameList, '/game', endpoint="Game")
 api.add_resource(Games, '/game/<int:games_id>', endpoint="gamesId")
-
 
 if __name__ == '__main__':
     app.run(debug=False)
